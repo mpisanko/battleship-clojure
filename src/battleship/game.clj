@@ -1,6 +1,5 @@
 (ns battleship.game
-  (:require [clojure.set :as s]
-            [battleship.board :as b]
+  (:require [battleship.board :as b]
             [battleship.validation :as v]))
 
 (def ^:private game-boards (atom {:p1 {} :p2 {}}))

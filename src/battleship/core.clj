@@ -1,7 +1,6 @@
 (ns battleship.core
   (:gen-class :main true)
-  (:require [battleship.validation :as v]
-            [battleship.game :as g]
+  (:require [battleship.game :as g]
             [battleship.board :as b]))
 
 (defn create-empty-boards!
