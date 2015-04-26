@@ -3,7 +3,7 @@
             [battleship.validation :as v]))
 
 ;; TODO the dimesions (v-cols v-rows v-sizes)
-;; might be better off being meta-data of the board?
+;; should be passed into the game at start of game
 (def empty-board
   {:sizes #{}
    :positions #{}
