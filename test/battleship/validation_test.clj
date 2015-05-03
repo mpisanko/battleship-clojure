@@ -1,7 +1,10 @@
 (ns battleship.validation-test
   (:require [battleship.validation :refer :all]
             [battleship.board :as b]
-            [midje.sweet :refer :all]))
+            [midje.sweet :refer :all]
+            [clojure.test.check :as tc]
+            [clojure.test.check.generators :as gen]
+            [clojure.test.check.properties :as prop]))
 
 (def b b/empty-board)
 (def valid-ship #{[:c 2] [:c 3] [:c 4]})
@@ -26,14 +29,23 @@
     "cannot place more than one shio of the same size"
     (can-place? #{[:a 6] [:a 7] [:a 8] [:a 9]} non-empty) => false))
 
+(def val-pos-gen
+  (gen/tuple (gen/elements (:v-cols b)) (gen/elements (:v-rows b))))
+
+(def invalid-pos-gen
+  (gen/tuple
+    (gen/such-that #(not (contains? (:v-cols b) %)) gen/keyword)
+    (gen/such-that #(not (contains? (:v-rows b) %)) gen/int)))
+
 (facts
   valid-position?
-  (tabular "valid - invalid positions"
-    (fact (valid-position? ?position b) => ?valid)
-    ?position   ?valid
-    [:a 1]      true
-    [:j 10]     true
-    [:c 7]      true
-    [:a -1]     false
-    [:k 2]      false
-    [:z 11]     false))
+  (fact "valid"
+    (tc/quick-check 1000
+      (prop/for-all
+        [p val-pos-gen]
+        (valid-position? p b))) => (contains {:result true}))
+  (fact "invalid"
+    (tc/quick-check 1000
+      (prop/for-all
+        [p invalid-pos-gen]
+        (= false (valid-position? p b)))) => (contains {:result true})))
